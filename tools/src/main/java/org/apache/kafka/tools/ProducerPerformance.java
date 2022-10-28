@@ -66,6 +66,7 @@ public class ProducerPerformance {
             List<String> producerProps = res.getList("producerConfig");
             String producerConfig = res.getString("producerConfigFile");
             String payloadFilePath = res.getString("payloadFile");
+            String keyFilePath = res.getString("keyFile");
             String transactionalId = res.getString("transactionalId");
             boolean shouldPrintMetrics = res.getBoolean("printMetrics");
             long transactionDurationMs = res.getLong("transactionDurationMs");
@@ -79,6 +80,7 @@ public class ProducerPerformance {
             }
 
             List<byte[]> payloadByteList = readPayloadFile(payloadFilePath, payloadDelimiter);
+            List<byte[]> keyByteList = readPayloadFile(keyFilePath, payloadDelimiter);
 
             Properties props = readProps(producerProps, producerConfig, transactionalId, transactionsEnabled);
 
@@ -91,6 +93,10 @@ public class ProducerPerformance {
             byte[] payload = null;
             if (recordSize != null) {
                 payload = new byte[recordSize];
+            }
+            byte [] keyPayload = null;
+            if (keyFilePath != null) {
+                keyPayload = new byte[16];
             }
             Random random = new Random(0);
             ProducerRecord<byte[], byte[]> record;
@@ -110,7 +116,12 @@ public class ProducerPerformance {
                     transactionStartTime = System.currentTimeMillis();
                 }
 
-                record = new ProducerRecord<>(topicName, payload);
+                if (keyFilePath == null) {
+                  record = new ProducerRecord<>(topicName, payload);
+                } else {
+                  keyPayload = generateRandomPayload(16, keyByteList, keyPayload, random);
+                  record = new ProducerRecord<>(topicName, keyPayload, payload);
+                }
 
                 long sendStartMs = System.currentTimeMillis();
                 Callback cb = stats.nextCompletion(sendStartMs, payload.length, stats);
@@ -264,6 +275,16 @@ public class ProducerPerformance {
                 .help("file to read the message payloads from. This works only for UTF-8 encoded text files. " +
                         "Payloads will be read from this file and a payload will be randomly selected when sending messages. " +
                         "Note that you must provide exactly one of --record-size or --payload-file.");
+
+        parser.addArgument("--key-file")
+                .action(store())
+                .required(false)
+                .type(String.class)
+                .metavar("KEY-FILE")
+                .dest("keyFile")
+                .help("file to read the key payloads from. This works only for UTF-8 encoded text files. " +
+                        "Keys will be read from this file and a payload will be randomly selected when sending messages. " +
+                        "If this is unspecified, null keys will be used.");
 
         parser.addArgument("--payload-delimiter")
                 .action(store())
