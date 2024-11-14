@@ -245,13 +245,13 @@
                     See <a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-956+Tiered+Storage+Quotas">KIP-956</a> for more details.</li>
             </ul>
         </li>
-        <li>KRaft now supports dynamic quorums for new KRaft clusters. See <a href="/{{version}}/documentation.html#kraft_reconfig">here</a> for more details. The below enhancements are added in this release.
+        <li>KRaft now supports dynamic quorums for new KRaft clusters. See <a href="/{{version}}/documentation.html#kraft_reconfig">here</a> for more details. The below enhancements are included in this release.
             <ul>
-                <li>Controllers can be configured for dynamic quorum at creation time by formatting their KRaft controller log directory with the `--standalone` or `--initial-controllers` option.</li>
+                <li>At creation time, controllers can be configured as a dynamic quorum by formatting their KRaft controller log directory with the `--standalone` or `--initial-controllers` option.</li>
                 <li>Controllers can be added in observer mode to an existing dynamic quorum by formatting their KRaft controller log directory with the `--no-initial-controllers` option</li>
                 <li>Observers controllers can be promoted to or removed from the set of voters with the `add-controller` or `remove-controller` subcommands on the `kafka-metadata-quorum` tool</li>
                 <li>Controller listeners can now be included in the `advertised.listeners` property.
-                    This provides KRaft clients (including other controllers) connection information to communicate with dynamically-configured KRaft controllers.</li>
+                    This provides KRaft clients (including other controllers) connection information in order to communicate with dynamically-configured KRaft controllers.</li>
             </ul>
         </li>
     </ul>
